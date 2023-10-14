@@ -1,4 +1,10 @@
-{%- set run_date = var('run_date') -%}
+{#- 
+	A few ways to get run_date variable:
+	- 1. Get the run_date from dbt_profiles.yml
+	- 2. Overrided run_date in 1 by passing vars from `dbt run --vars '{"run_date": "2023-10-01"}'.`
+	- 3. Run with run_date=today by deleting the run_date in dbt_profiles.yml.
+-#}
+{%- set run_date = var('run_date', modules.datetime.datetime.today().strftime("%Y-%m-%d")) -%}
 {%- set interval = var('interval') -%}
 
 {{ config(
