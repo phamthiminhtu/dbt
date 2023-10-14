@@ -1,4 +1,4 @@
-{#- 
+{#-
 	This model uses the "delete+insert" strategy using the run_date variable:
 		It will delete data with scraped_date in the [run_date - 2,  run_date] range
 		and insert new data of that date range.
@@ -11,16 +11,26 @@
 {%- set interval = var('interval') -%}
 
 {{ config(
-	partition_by=['scraped_date'],
-	unique_key='scraped_date',
-	partition_type="date",
-	materialized='incremental',
-	incremental_strategy='delete+insert',
-) 
+		partition_by=['scraped_date'],
+		unique_key='scraped_date',
+		partition_type="date",
+		materialized='incremental',
+		incremental_strategy='delete+insert',
+)
 }}
 
 WITH
-	listings_stg AS
+
+	dim_host AS
+		(SELECT * FROM {{ ref('dim_host') }})
+
+	,dim_suburb AS
+		(SELECT * FROM {{ ref('dim_suburb') }})
+
+	,dim_property AS
+		(SELECT * FROM {{ ref('dim_property') }})
+
+	,listings_stg AS
 		(SELECT * FROM {{ ref("listings_stg") }}
 		-- insert overwrite 3 day data: from run_date - 2 to run_date
 		{% if is_incremental() %}
@@ -28,4 +38,19 @@ WITH
 		{% endif %}
 		)
 
-	SELECT * FROM listings_stg
+	SELECT
+		l.*,
+		dh.host_is_superhost,
+		dh.host_neighbourhood,
+		dp.room_type,
+		dp.property_type,
+		dp.accommodates,
+		dp.listing_neighbourhood,
+		db.suburb_name AS host_neighbourhood_lga
+	FROM listings_stg AS l
+	LEFT JOIN dim_property AS dp
+	ON l.listing_id = dp.listing_id AND l.scraped_date BETWEEN dp.dbt_valid_from AND COALESCE(dp.dbt_valid_to, '999-12-09'::date)
+	LEFT JOIN dim_host AS dh
+	ON l.host_id = dh.host_id AND l.scraped_date BETWEEN dh.dbt_valid_from AND COALESCE(dh.dbt_valid_to, '9999-12-09'::date)
+	LEFT JOIN dim_suburb AS db
+	ON dh.host_neighbourhood = db.lga_name AND l.scraped_date BETWEEN db.dbt_valid_from AND COALESCE(db.dbt_valid_to, '9999-12-09'::date)
