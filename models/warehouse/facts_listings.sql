@@ -46,7 +46,7 @@ WITH
 		dp.property_type,
 		dp.accommodates,
 		dp.listing_neighbourhood,
-		db.suburb_name AS host_neighbourhood_lga
+		db.lga_name AS host_neighbourhood_lga
 	FROM listings_stg AS l
 	LEFT JOIN dim_property AS dp
 	ON l.listing_id = dp.listing_id AND l.scraped_date BETWEEN dp.dbt_valid_from AND COALESCE(dp.dbt_valid_to, '999-12-09'::date)
