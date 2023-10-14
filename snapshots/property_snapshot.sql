@@ -1,4 +1,4 @@
-{% snapshot listings_snapshot %}
+{% snapshot property_snapshot %}
 
 {{ config(
   strategy="timestamp",

@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: host_stg
+    columns:
+      - name: host_id
+        tests:
+          - unique
+  - name: property_stg
+    columns:
+      - name: listing_id
+        tests:
+          - unique
+  - name: facts_listings
+    tests:
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('listings_stg')
+      - equal_sum:
+          column_1: price
+          compare_to: ref('facts_listings')
+          column_2: price

@@ -33,10 +33,22 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   bde:
     +materialized: view
-    +schema: airbnb
+    staging:
+      +schema: staging
+      +materialized: view
+    datamart:
+      +schema: datamart
+      +materialized: view
+    warehouse:
+      +schema: warehouse
+      +materialized: table
 
 snapshots:
   bde:
     +materialized: snapshot
     +strategy: timestamp
-    +target_schema: airbnb_raw
+    +target_schema: snapshot
+
+vars:
+  run_date: '2021-04-15'
+  interval: 2
