@@ -1,10 +1,13 @@
 {% snapshot lga_snapshot %}
 
 {{ config(
-  strategy="check",
-  unique_key="lga_code",
-  check_cols='all'
+  strategy="timestamp",
+  updated_at="ingestion_date",
+  unique_key="lga_code"
 ) }}
 
-SELECT * FROM {{ source('airbnb_raw', 'nsw_lga_code') }}
+SELECT
+  *,
+  DATE(ingestion_timestamp) AS ingestion_date
+FROM {{ source('airbnb_raw', 'nsw_lga_code') }}
 {% endsnapshot %}
