@@ -3,6 +3,7 @@
 {{
   handle_dbt_valid_from(
     source=ref('lga_snapshot'),
+    unique_key='lga_code',
     columns_to_select=[
       'lga_code',
       'lga_name'
