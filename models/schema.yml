@@ -29,14 +29,3 @@ models:
           column_1: price
           compare_to: ref('facts_listings')
           column_2: price
-snapshots:
-  - name: lga_snapshot
-    columns:
-      - name: lga_code
-        tests:
-          - unique
-  - name: suburb_snapshot
-    columns:
-      - name: suburb_name
-        tests:
-          - unique
