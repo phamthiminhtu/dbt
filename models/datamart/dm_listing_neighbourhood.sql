@@ -6,7 +6,8 @@ WITH
       *,
       DATE_TRUNC('month', scraped_date)::DATE AS month_year,
       CASE WHEN {{ is_active_listing }} THEN listing_id END AS active_listing_id,
-      CASE WHEN {{ is_active_listing }} THEN price END AS active_listing_price
+      CASE WHEN {{ is_active_listing }} THEN price END AS active_listing_price,
+      CASE WHEN {{ is_active_listing }} THEN 30 - availability_30 END AS number_of_stays
     FROM {{ ref('facts_listings') }})
 
   ,agg_data AS
@@ -21,11 +22,11 @@ WITH
       COUNT(DISTINCT host_id) AS distinct_host_count,
       COUNT(DISTINCT CASE WHEN host_is_superhost = 't' THEN host_id END)*100/COUNT(DISTINCT host_id) AS super_host_rate,
       AVG(CASE WHEN {{ is_active_listing }} THEN review_scores_rating END) AS active_listing_avg_review_scores_rating,
-      SUM(CASE WHEN {{ is_active_listing }} THEN 30 - availability_30 END) AS total_number_of_stays,
+      SUM(number_of_stays) AS total_number_of_stays,
       SUM(
-        CASE WHEN {{ is_active_listing }} THEN 30 - availability_30 END
+        number_of_stays
         * active_listing_price
-      )/ COUNT(DISTINCT active_listing_id) AS avg_estimated_revenue_per_listing,
+      )/ COUNT(DISTINCT active_listing_id) AS avg_estimated_revenue_per_active_listing,
       COUNT(DISTINCT active_listing_id) AS unique_active_listing_count,
       COUNT(
         DISTINCT 
@@ -67,5 +68,8 @@ WITH
       / NULLIF(previous_month_unique_inactive_listing_count, 0)
     ) AS inactive_listings_percentage_change,
     total_number_of_stays,
-    avg_estimated_revenue_per_listing
+    avg_estimated_revenue_per_active_listing
   FROM final
+  ORDER BY
+    listing_neighbourhood,
+    month_year

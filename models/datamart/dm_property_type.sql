@@ -86,3 +86,8 @@ WITH
     total_number_of_stays,
     avg_estimated_revenue_per_listing
   FROM final
+  ORDER BY
+    property_type,
+    room_type,
+    accommodates,
+    month_year
