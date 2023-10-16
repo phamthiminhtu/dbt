@@ -11,7 +11,9 @@ WITH
 
   ,agg_data AS
     (SELECT
-      listing_neighbourhood,
+      property_type,
+      room_type,
+      accommodates,
       month_year,
       COUNT(DISTINCT active_listing_id)*100/ COUNT(DISTINCT listing_id) AS active_listing_rate,
       MIN(active_listing_price) AS min_active_listing_price,
@@ -22,33 +24,48 @@ WITH
       COUNT(DISTINCT CASE WHEN host_is_superhost = 't' THEN host_id END)*100/COUNT(DISTINCT host_id) AS super_host_rate,
       AVG(CASE WHEN {{ is_active_listing }} THEN review_scores_rating END) AS active_listing_avg_review_scores_rating,
       SUM(CASE WHEN {{ is_active_listing }} THEN 30 - availability_30 END) AS total_number_of_stays,
-      SUM(
-        CASE WHEN {{ is_active_listing }} THEN 30 - availability_30 END
-        * active_listing_price
-      )/ COUNT(DISTINCT active_listing_id) AS avg_estimated_revenue_per_listing,
+      (
+        SUM(
+          CASE WHEN {{ is_active_listing }} THEN 30 - availability_30 END
+          * active_listing_price
+        )
+        / COUNT(DISTINCT active_listing_id)
+      ) AS avg_estimated_revenue_per_listing,
       COUNT(DISTINCT active_listing_id) AS unique_active_listing_count,
       COUNT(
         DISTINCT 
-          CASE WHEN NOT COALESCE({{ is_active_listing }}, FALSE) THEN listing_id END
-        ) AS unique_inactive_listing_count
+        CASE WHEN NOT COALESCE({{ is_active_listing }}, FALSE) THEN listing_id END
+      ) AS unique_inactive_listing_count
     FROM facts_listings
     GROUP BY
-      listing_neighbourhood,
+      property_type,
+      room_type,
+      accommodates,
       month_year)
 
   ,final AS
     (SELECT
       *,
       LAG(unique_active_listing_count, 1) OVER(
-        PARTITION BY listing_neighbourhood ORDER BY month_year
+        PARTITION BY
+          property_type,
+          room_type,
+          accommodates
+        ORDER BY month_year
       ) AS previous_month_unique_active_listing_count,
       LAG(unique_inactive_listing_count, 1) OVER(
-        PARTITION BY listing_neighbourhood ORDER BY month_year
+        PARTITION BY
+          property_type,
+          room_type,
+          accommodates
+        ORDER BY month_year
       ) AS previous_month_unique_inactive_listing_count
     FROM agg_data)
   
   SELECT
-    listing_neighbourhood,
+    property_type,
+    room_type,
+    accommodates,
     month_year,
     active_listing_rate,
     min_active_listing_price,
