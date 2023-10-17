@@ -4,7 +4,7 @@ WITH
       *,
       CASE WHEN has_availability = 't' THEN listing_id END AS active_listing_id,
       CASE WHEN has_availability = 't' THEN price END AS active_listing_price,
-      30 - availability_30 AS number_of_stays
+      CASE WHEN has_availability = 't' THEN 30 - availability_30 END AS number_of_stays
     FROM "postgres"."warehouse"."facts_listings")
 
   ,agg AS
@@ -20,6 +20,6 @@ WITH
 
   SELECT
     *,
-    ROW_NUMBER() OVER(ORDER BY estimated_revenue_per_active_listings DESC) AS ranking
+    RANK() OVER(ORDER BY estimated_revenue_per_active_listings DESC) AS ranking
   FROM agg
   ORDER BY ranking
