@@ -19,7 +19,7 @@ WITH
       MIN(active_listing_price) AS min_active_listing_price,
       MAX(active_listing_price) AS max_active_listing_price,
       PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY active_listing_price) AS median_active_listing_price,
-      AVG(active_listing_price) AS avg_active_listing_price,
+      AVG(active_listing_price)::FLOAT AS avg_active_listing_price,
       COUNT(DISTINCT host_id) AS distinct_host_count,
       COUNT(DISTINCT CASE WHEN host_is_superhost = 't' THEN host_id END)*100/COUNT(DISTINCT host_id) AS super_host_rate,
       AVG(CASE WHEN {{ is_active_listing }} THEN review_scores_rating END) AS active_listing_avg_review_scores_rating,
@@ -78,11 +78,11 @@ WITH
     (
       (unique_active_listing_count - previous_month_unique_active_listing_count)*100
       / NULLIF(previous_month_unique_active_listing_count, 0)
-    ) AS active_listings_percentage_change,
+    )::FLOAT AS active_listings_percentage_change,
     (
       (unique_inactive_listing_count - previous_month_unique_inactive_listing_count)*100
       / NULLIF(previous_month_unique_inactive_listing_count, 0)
-    ) AS inactive_listings_percentage_change,
+    )::FLOAT AS inactive_listings_percentage_change,
     total_number_of_stays,
     avg_estimated_revenue_per_listing
   FROM final
