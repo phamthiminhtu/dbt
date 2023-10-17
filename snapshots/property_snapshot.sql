@@ -14,6 +14,13 @@ WITH
     FROM {{ source('airbnb_raw', 'listings') }}
     )
 
-  SELECT * FROM source
+  SELECT
+    listing_id,
+    listing_neighbourhood,
+    property_type,
+    room_type,
+    accommodates,
+    ingestion_timestamp
+  FROM source
   WHERE _row_number = 1
 {% endsnapshot %}
