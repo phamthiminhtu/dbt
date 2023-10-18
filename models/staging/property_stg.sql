@@ -5,7 +5,7 @@
     source=ref('property_snapshot'),
     columns_to_select=[
       'listing_id',
-      'listing_neighbourhood',
+      'UPPER(listing_neighbourhood) AS listing_neighbourhood_lga',
       'property_type',
       'room_type',
       'accommodates',

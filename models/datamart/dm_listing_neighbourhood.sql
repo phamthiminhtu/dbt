@@ -12,7 +12,7 @@ WITH
 
   ,agg_data AS
     (SELECT
-      listing_neighbourhood,
+      listing_neighbourhood_lga,
       month_year,
       (COUNT(DISTINCT active_listing_id)::FLOAT*100/ COUNT(DISTINCT listing_id))::FLOAT AS active_listing_rate,
       MIN(active_listing_price) AS min_active_listing_price,
@@ -34,22 +34,22 @@ WITH
         ) AS unique_inactive_listing_count
     FROM facts_listings
     GROUP BY
-      listing_neighbourhood,
+      listing_neighbourhood_lga,
       month_year)
 
   ,final AS
     (SELECT
       *,
       LAG(unique_active_listing_count, 1) OVER(
-        PARTITION BY listing_neighbourhood ORDER BY month_year
+        PARTITION BY listing_neighbourhood_lga ORDER BY month_year
       ) AS previous_month_unique_active_listing_count,
       LAG(unique_inactive_listing_count, 1) OVER(
-        PARTITION BY listing_neighbourhood ORDER BY month_year
+        PARTITION BY listing_neighbourhood_lga ORDER BY month_year
       ) AS previous_month_unique_inactive_listing_count
     FROM agg_data)
   
   SELECT
-    listing_neighbourhood,
+    listing_neighbourhood_lga,
     month_year,
     active_listing_rate,
     min_active_listing_price,
@@ -71,5 +71,5 @@ WITH
     avg_estimated_revenue_per_active_listing
   FROM final
   ORDER BY
-    listing_neighbourhood,
+    listing_neighbourhood_lga,
     month_year

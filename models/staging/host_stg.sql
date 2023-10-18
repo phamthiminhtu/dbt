@@ -8,8 +8,7 @@
         'host_name',
         "TO_DATE(host_since, 'DD/MM/YYYY') AS host_since",
         'host_is_superhost',
-        'host_neighbourhood',
-        'UPPER(TRIM(host_neighbourhood)) AS host_neighbourhood_upper',
+        'UPPER(TRIM(host_neighbourhood)) AS host_neighbourhood',
         'ingestion_timestamp'
     ])
 }}
