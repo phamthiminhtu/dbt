@@ -5,7 +5,7 @@ WITH
   ,dim_host AS
     (SELECT
       host_id,
-      host_neighbourhood_upper AS current_host_neighbourhood_upper
+      host_neighbourhood AS current_host_neighbourhood
     FROM "postgres"."warehouse"."dim_host"
     WHERE dbt_valid_to IS NULL)
 
@@ -30,12 +30,12 @@ WITH
       COALESCE(ds.lga_name, 'OUTSIDE_NSW') AS current_host_lga_name
     FROM dim_host AS dh
     LEFT JOIN dim_suburb AS ds
-    ON dh.current_host_neighbourhood_upper = ds.suburb_name)
+    ON dh.current_host_neighbourhood = ds.suburb_name)
 
   ,get_host_listings_lga AS
     (SELECT DISTINCT
       host_id,
-      UPPER(listing_neighbourhood) AS listing_neighbourhood_lga_name
+      listing_neighbourhood_lga
     FROM facts_listings)
 
  ,get_host_listing_neighbourhood_info AS
@@ -43,7 +43,7 @@ WITH
       ghll.host_id,
       MAX(
         CASE
-          WHEN ghcl.current_host_lga_name = ghll.listing_neighbourhood_lga_name THEN 1
+          WHEN ghcl.current_host_lga_name = ghll.listing_neighbourhood_lga THEN 1
           ELSE 0
         END
       ) AS has_listing_in_neighbourhood

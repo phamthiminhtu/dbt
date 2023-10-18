@@ -23,7 +23,7 @@ WITH
   ,dim_host AS
     (SELECT
       host_id,
-      host_neighbourhood_upper AS current_host_neighbourhood_upper
+      host_neighbourhood AS current_host_neighbourhood
     FROM "postgres"."warehouse"."dim_host"
     WHERE dbt_valid_to IS NULL)
 
@@ -49,7 +49,7 @@ WITH
       dl.lga_code
     FROM dim_host AS dh
     LEFT JOIN dim_suburb AS ds
-    ON dh.current_host_neighbourhood_upper = ds.suburb_name
+    ON dh.current_host_neighbourhood = ds.suburb_name
     LEFT JOIN dim_lga AS dl
     ON ds.lga_name = dl.lga_name)
 
