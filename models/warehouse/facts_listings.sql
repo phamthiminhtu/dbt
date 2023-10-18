@@ -52,8 +52,8 @@ WITH
 		ds.lga_name AS host_neighbourhood_lga
 	FROM listings_stg AS l
 	LEFT JOIN dim_property AS dp
-	ON l.listing_id = dp.listing_id AND l.scraped_date >= dp.dbt_valid_from AND l.scraped_date < COALESCE(dp.dbt_valid_to, '9999-01-01'::DATE)
+	ON l.listing_id = dp.listing_id AND l.scraped_date >= dp.dbt_valid_from AND l.scraped_date < COALESCE(dp.dbt_valid_to, '9999-01-01'::TIMESTAMP)
 	LEFT JOIN dim_host AS dh
-	ON l.host_id = dh.host_id AND l.scraped_date >= dp.dbt_valid_from AND l.scraped_date < COALESCE(dh.dbt_valid_to, '9999-01-01'::DATE)
+	ON l.host_id = dh.host_id AND l.scraped_date >= dp.dbt_valid_from AND l.scraped_date < COALESCE(dh.dbt_valid_to, '9999-01-01'::TIMESTAMP)
 	LEFT JOIN dim_suburb AS ds
-	ON dh.host_neighbourhood_upper = ds.suburb_name AND l.scraped_date >= ds.dbt_valid_from AND l.scraped_date < COALESCE(ds.dbt_valid_to, '9999-01-01'::DATE)
+	ON dh.host_neighbourhood_upper = ds.suburb_name AND l.scraped_date >= ds.dbt_valid_from AND l.scraped_date < COALESCE(ds.dbt_valid_to, '9999-01-01'::TIMESTAMP)
