@@ -5,6 +5,6 @@
     source=ref('lga_snapshot'),
     columns_to_select=[
       'lga_code',
-      'lga_name'
+      'UPPER(lga_name) AS lga_name'
     ])
 }}

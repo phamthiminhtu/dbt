@@ -42,7 +42,7 @@ WITH
   ,dim_lga AS
     (SELECT
       lga_code,
-      UPPER(lga_name) AS lga_name_upper
+      lga_name
     FROM "postgres"."warehouse"."dim_lga"
     WHERE dbt_valid_to IS NULL)
 
@@ -71,7 +71,7 @@ WITH
       dl.lga_code
     FROM dim_suburb AS ds
     LEFT JOIN dim_lga AS dl
-    ON ds.lga_name = dl.lga_name_upper)
+    ON ds.lga_name = dl.lga_name)
 
   ,final AS
     (SELECT

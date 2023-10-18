@@ -16,7 +16,7 @@ WITH
   ,dim_lga AS
     (SELECT
       lga_code,
-      UPPER(lga_name) AS lga_name_upper
+      lga_name
     FROM "postgres"."warehouse"."dim_lga"
     WHERE dbt_valid_to IS NULL)
   
@@ -51,7 +51,7 @@ WITH
     LEFT JOIN dim_suburb AS ds
     ON dh.current_host_neighbourhood_upper = ds.suburb_name
     LEFT JOIN dim_lga AS dl
-    ON ds.lga_name = dl.lga_name_upper)
+    ON ds.lga_name = dl.lga_name)
 
   ,get_host_with_one_listing_info AS
     (SELECT
@@ -76,6 +76,6 @@ WITH
     GROUP BY has_median_mortgage_repay_annualised_covered)
   
   SELECT
-    *,
+    CASE WHEN has_median_mortgage_repay_annualised_covered THEN 'yes' ELSE 'no' END AS has_median_mortgage_repay_annualised_covered,
     (host_count*100/SUM(host_count) OVER())::FLOAT AS percent
   FROM final
