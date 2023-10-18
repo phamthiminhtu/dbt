@@ -14,15 +14,9 @@ WITH
     host_neighbourhood_lga,
     month_year,
     COUNT(DISTINCT host_id) AS distinct_host_count,
-    SUM(
-      CASE WHEN {{ is_active_listing }} THEN number_of_stays END
-      * active_listing_price
-    ) AS estimated_revenue,
+    SUM(number_of_stays* active_listing_price) AS estimated_revenue,
     (
-      SUM(
-        CASE WHEN {{ is_active_listing }} THEN number_of_stays END
-        * active_listing_price
-      )
+      SUM(number_of_stays* active_listing_price)
       / COUNT(DISTINCT host_id)
     ) AS avg_estimated_revenue_per_host
   FROM facts_listings
