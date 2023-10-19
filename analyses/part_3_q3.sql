@@ -64,6 +64,6 @@ WITH
       ghl.is_host_having_multiple_listing)
 
   SELECT
-    CASE WHEN is_host_having_multiple_listing THEN 'yes' ELSE 'no' END is_host_having_multiple_listing,,
+    CASE WHEN is_host_having_multiple_listing THEN 'yes' ELSE 'no' END is_host_having_multiple_listing,
     (host_count/ SUM(host_count) OVER ())::FLOAT*100 AS percent
   FROM final
