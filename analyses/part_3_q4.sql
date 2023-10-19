@@ -53,7 +53,7 @@ WITH
 
   ,compare_with_listing_mortgage_repayment AS
     (SELECT
-      ghwolp.estimated_revenue_last_12_months > c.annualised_median_mortgage_repay AS has_median_mortgage_repay_annualised_covered,
+      ghwolp.estimated_revenue_last_12_months >= c.annualised_median_mortgage_repay AS has_median_mortgage_repay_annualised_covered,
       COUNT(ghwolp.host_id) AS host_count
     FROM get_host_with_one_listing_performance AS ghwolp
     LEFT JOIN census AS c
