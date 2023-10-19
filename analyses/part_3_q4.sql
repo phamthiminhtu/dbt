@@ -28,28 +28,21 @@ WITH
     GROUP BY
       host_id)
     
-  ,get_host_listing_performance AS
+  ,get_host_with_one_listing_performance AS
     (SELECT
       fl.host_id,
       dl.lga_code,
       SUM(fl.number_of_stays * fl.active_listing_price) AS estimated_revenue_last_12_months
     FROM facts_listings AS fl
+    LEFT JOIN get_host_listing AS ghl
+    ON fl.host_id = ghl.host_id
     LEFT JOIN dim_lga AS dl
     ON fl.listing_neighbourhood_lga = dl.lga_name
-    GROUP BY
-      host_id,
-      lga_code)
-
-  ,get_host_with_one_listing_performance AS
-    (SELECT
-      ghl.host_id,
-      ghlp.lga_code,
-      ghlp.estimated_revenue_last_12_months
-    FROM get_host_listing AS ghl
-    LEFT JOIN get_host_listing_performance AS ghlp
-    ON ghl.host_id = ghlp.host_id
     -- filter only hosts having 1 listing
-    WHERE ghl.is_host_having_one_listing)
+    WHERE ghl.is_host_having_one_listing
+    GROUP BY
+      fl.host_id,
+      lga_code)
 
   ,compare_with_listing_mortgage_repayment AS
     (SELECT
