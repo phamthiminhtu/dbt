@@ -54,16 +54,19 @@ WITH
   
   ,final AS
     (SELECT
-      ghl.is_host_having_multiple_listing,
+      CASE WHEN ghlni.has_listing_in_neighbourhood = 1 THEN 'yes' ELSE 'no' END AS has_listing_in_neighbourhood,
+      CASE WHEN ghl.is_host_having_multiple_listing THEN 'multiple' ELSE 'one' END AS number_of_listings_of_host,
       COUNT(ghlni.host_id) AS host_count
     FROM get_host_listing_neighbourhood_info AS ghlni
     LEFT JOIN get_host_listing AS ghl
     ON ghlni.host_id = ghl.host_id
-    WHERE ghlni.has_listing_in_neighbourhood = 1
     GROUP BY
-      ghl.is_host_having_multiple_listing)
+      ghlni.has_listing_in_neighbourhood,
+      number_of_listings_of_host)
 
   SELECT
-    CASE WHEN is_host_having_multiple_listing THEN 'yes' ELSE 'no' END is_host_having_multiple_listing,
-    (host_count/ SUM(host_count) OVER ())::FLOAT*100 AS percent
+    number_of_listings_of_host,
+    has_listing_in_neighbourhood,
+    (host_count/ SUM(host_count) OVER (PARTITION BY number_of_listings_of_host))::FLOAT*100 AS percentage_of_host
   FROM final
+  ORDER BY number_of_listings_of_host

@@ -3,7 +3,7 @@ WITH
   census AS
     (SELECT
       REPLACE(lga_code_2016, 'LGA', '') AS lga_code,
-      median_mortgage_repay_monthly
+      median_mortgage_repay_monthly*12 AS annualised_median_mortgage_repay
     FROM "postgres"."airbnb_raw"."census_lga_g02")
 
   ,facts_listings AS
@@ -19,63 +19,48 @@ WITH
       lga_name
     FROM "postgres"."warehouse"."dim_lga"
     WHERE dbt_valid_to IS NULL)
-  
-  ,dim_host AS
-    (SELECT
-      host_id,
-      host_neighbourhood AS current_host_neighbourhood
-    FROM "postgres"."warehouse"."dim_host"
-    WHERE dbt_valid_to IS NULL)
-
-  ,dim_suburb AS
-    (SELECT
-      lga_name,
-      suburb_name
-    FROM "postgres"."warehouse"."dim_suburb"
-    WHERE dbt_valid_to IS NULL)
 
   ,get_host_listing AS
     (SELECT
       host_id,
-      SUM(number_of_stays * active_listing_price) AS estimated_revenue,
-      COUNT(DISTINCT listing_id) > 1 AS is_host_having_multiple_listing
+      COUNT(DISTINCT listing_id) = 1 AS is_host_having_one_listing
     FROM facts_listings
     GROUP BY
       host_id)
-
-  ,get_host_current_lga AS
+    
+  ,get_host_listing_performance AS
     (SELECT
-      dh.host_id,
-      dl.lga_code
-    FROM dim_host AS dh
-    LEFT JOIN dim_suburb AS ds
-    ON dh.current_host_neighbourhood = ds.suburb_name
+      fl.host_id,
+      dl.lga_code,
+      SUM(fl.number_of_stays * fl.active_listing_price) AS estimated_revenue_last_12_months
+    FROM facts_listings AS fl
     LEFT JOIN dim_lga AS dl
-    ON ds.lga_name = dl.lga_name)
+    ON fl.listing_neighbourhood_lga = dl.lga_name
+    GROUP BY
+      host_id,
+      lga_code)
 
-  ,get_host_with_one_listing_info AS
+  ,get_host_with_one_listing_performance AS
     (SELECT
       ghl.host_id,
-      ghl.estimated_revenue,
-      ghcl.lga_code,
-      ghl.estimated_revenue > (c.median_mortgage_repay_monthly * 12) as has_median_mortgage_repay_annualised_covered
+      ghlp.lga_code,
+      ghlp.estimated_revenue_last_12_months
     FROM get_host_listing AS ghl
-    LEFT JOIN get_host_current_lga AS ghcl
-    ON ghl.host_id = ghcl.host_id
-    LEFT JOIN census AS c
-    ON ghcl.lga_code = c.lga_code
-    WHERE
-      NOT ghl.is_host_having_multiple_listing
-      AND ghcl.lga_code IS NOT NULL)
+    LEFT JOIN get_host_listing_performance AS ghlp
+    ON ghl.host_id = ghlp.host_id
+    -- filter only hosts having 1 listing
+    WHERE ghl.is_host_having_one_listing)
 
-  ,final AS
+  ,compare_with_listing_mortgage_repayment AS
     (SELECT
-      has_median_mortgage_repay_annualised_covered,
-      COUNT(*) AS host_count
-    FROM get_host_with_one_listing_info
+      ghwolp.estimated_revenue_last_12_months > c.annualised_median_mortgage_repay AS has_median_mortgage_repay_annualised_covered,
+      COUNT(ghwolp.host_id) AS host_count
+    FROM get_host_with_one_listing_performance AS ghwolp
+    LEFT JOIN census AS c
+    ON ghwolp.lga_code = c.lga_code
     GROUP BY has_median_mortgage_repay_annualised_covered)
-  
+
   SELECT
     CASE WHEN has_median_mortgage_repay_annualised_covered THEN 'yes' ELSE 'no' END AS has_median_mortgage_repay_annualised_covered,
     (host_count*100/SUM(host_count) OVER())::FLOAT AS percent
-  FROM final
+  FROM compare_with_listing_mortgage_repayment
