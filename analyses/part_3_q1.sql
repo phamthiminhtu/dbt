@@ -70,8 +70,8 @@ WITH
     LEFT JOIN census_1 AS c1
     ON dl.lga_code = c1.lga_code
     LEFT JOIN census_2 AS c2
-    ON dl.lga_code = c2.lga_code
-    ORDER BY ranking)
+    ON dl.lga_code = c2.lga_code)
   
   SELECT * FROM final
   WHERE ranking in (1, 29)
+  ORDER BY ranking
