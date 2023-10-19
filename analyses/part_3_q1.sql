@@ -61,7 +61,7 @@ WITH
   ,final AS
     (SELECT
       a.*,
-      c1.age_under_34_population*100/total_population AS age_under_percent,
+      c1.age_under_34_population*100/total_population AS age_under_34_percent,
       c2.median_age_persons,
       RANK() OVER(ORDER BY estimated_revenue_per_active_listings DESC) AS ranking
     FROM agg AS a
