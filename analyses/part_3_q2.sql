@@ -42,8 +42,8 @@ WITH
   ,get_rank AS
     (SELECT
       *,
-      RANK() OVER(PARTITION BY listing_neighbourhood_lga ORDER BY number_of_stays DESC) AS _rank
+      RANK() OVER(PARTITION BY listing_neighbourhood_lga ORDER BY number_of_stays DESC) AS number_of_stays_ranking
     FROM agg)
   
   SELECT * FROM get_rank
-  WHERE _rank = 1
+  WHERE number_of_stays_ranking = 1
