@@ -47,7 +47,7 @@ snapshots:
   bde:
     +materialized: snapshot
     +strategy: timestamp
-    +target_schema: snapshot
+    +target_schema: airbnb_raw
 
 vars:
   run_date: '2021-04-15'
