@@ -3,6 +3,7 @@
 {{
   handle_dbt_valid_from(
     source=ref('suburb_snapshot'),
+    unique_key='lga_name',
     columns_to_select=[
       'lga_name',
       'suburb_name'

@@ -4,15 +4,20 @@
   Modularize the logic into a macro to reduce duplicate code.
 -#}
 
-{% macro handle_dbt_valid_from(source, columns_to_select) -%}
+{% macro handle_dbt_valid_from(source, unique_key, columns_to_select) -%}
   WITH
     source_data AS
-      (SELECT * FROM {{ source }})
+      (SELECT
+        *,
+        {{ unique_key }} AS unique_key
+      FROM {{ source }})
 
     ,get_min_dbt_valid_from AS
       (SELECT
+        unique_key,
         MIN(dbt_valid_from) AS min_dbt_valid_from
-      FROM source_data)
+      FROM source_data
+      GROUP BY unique_key)
 
     SELECT
       {{ columns_to_select | join(',\n')}},
@@ -22,6 +27,7 @@
       CASE WHEN DATE(dbt_valid_from) = DATE(m.min_dbt_valid_from) THEN '1111-01-01'::TIMESTAMP ELSE dbt_valid_from END AS dbt_valid_from,
       dbt_valid_to
     FROM source_data AS s
-    CROSS JOIN get_min_dbt_valid_from AS m
+    LEFT JOIN get_min_dbt_valid_from AS m
+    ON s.unique_key = m.unique_key
 
 {%- endmacro %}

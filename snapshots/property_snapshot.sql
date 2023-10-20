@@ -2,7 +2,7 @@
 
 {{ config(
   strategy="timestamp",
-  updated_at="ingestion_timestamp",
+  updated_at="updated_at",
   unique_key="listing_id",
 ) }}
 
@@ -20,7 +20,7 @@ WITH
     property_type,
     room_type,
     accommodates,
-    ingestion_timestamp
+    scraped_date::TIMESTAMP AS updated_at
   FROM source
   WHERE _row_number = 1
 {% endsnapshot %}

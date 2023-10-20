@@ -2,7 +2,7 @@
 
 {{ config(
   strategy="timestamp",
-  updated_at="ingestion_timestamp",
+  updated_at="updated_at",
   unique_key="host_id",
 ) }}
 
@@ -19,7 +19,7 @@ WITH
     host_since,
     host_is_superhost,
     host_neighbourhood,
-    ingestion_timestamp
+    scraped_date::TIMESTAMP AS updated_at
   FROM source
   WHERE _row_number = 1
 {% endsnapshot %}
