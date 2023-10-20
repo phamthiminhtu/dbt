@@ -1,7 +1,7 @@
 WITH
   census_1 AS
     (SELECT
-      REPLACE(lga_code_2016, 'LGA', '') AS lga_code,
+      lga_code,
       SUM(
         age_0_4_yr_p
         + age_5_14_yr_p
@@ -22,15 +22,17 @@ WITH
         + age_75_84_yr_p
         + age_85ov_p
       ) AS total_population
-    FROM "postgres"."airbnb_raw"."census_lga_g01"
+    FROM "postgres"."warehouse"."dim_census_1"
+    WHERE dbt_valid_to IS NULL
     GROUP BY
       lga_code)
 
   ,census_2 AS
     (SELECT
-      REPLACE(lga_code_2016, 'LGA', '') AS lga_code,
+      lga_code,
       median_age_persons
-    FROM "postgres"."airbnb_raw"."census_lga_g02")
+    FROM "postgres"."warehouse"."dim_census_2"
+    WHERE dbt_valid_to IS NULL)
 
   ,dim_lga AS
     (SELECT

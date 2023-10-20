@@ -2,9 +2,9 @@ WITH
 
   census AS
     (SELECT
-      REPLACE(lga_code_2016, 'LGA', '') AS lga_code,
+      lga_code,
       median_mortgage_repay_monthly*12 AS annualised_median_mortgage_repay
-    FROM "postgres"."airbnb_raw"."census_lga_g02")
+    FROM "postgres"."warehouse"."dim_census_2")
 
   ,facts_listings AS
     (SELECT
