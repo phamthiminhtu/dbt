@@ -27,5 +27,5 @@ models:
           compare_model: ref('listings_stg')
       - equal_sum:
           column_1: price
-          compare_to: ref('facts_listings')
+          compare_to: source('airbnb_raw', 'listings')
           column_2: price

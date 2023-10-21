@@ -1,8 +1,13 @@
 {#-
 	This model uses the "delete+insert" (i.e. insert overwrite) strategy
 	using the run_date variable:
-		It will delete data with scraped_date in the [run_date - 2,  run_date] range
-		and insert new data of that date range.
+		Because postgres does not support "insert overwrite" strategy, we use
+		the "delete+insert" strategy instead:
+		- dbt will delete data with scraped_date in the [run_date - 2,  run_date] range
+		and insert new data of that date range. 
+		- The config `unique_key='scraped_date'` is used for this purpose, 
+		although scraped_date is not the unique_key of the table. This setting is equal
+		to the "insert overwrite" strategy in other databases.
 
 	A few ways to define run_date variable:
 		1. Define the run_date in dbt_profiles.yml (default)
