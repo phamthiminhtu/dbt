@@ -1,26 +1,6 @@
 version: 2
 
 models:
-  - name: host_stg
-    columns:
-      - name: host_id
-        tests:
-          - unique
-  - name: property_stg
-    columns:
-      - name: listing_id
-        tests:
-          - unique
-  - name: dim_suburb
-    columns:
-      - name: suburb_name
-        tests:
-          - unique
-  - name: dim_lga
-    columns:
-      - name: lga_code
-        tests:
-          - unique
   - name: facts_listings
     tests:
       - dbt_utils.equal_rowcount:
