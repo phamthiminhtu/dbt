@@ -1,0 +1,1 @@
+SELECT * FROM {{ source('airbnb_raw', 'nsw_lga_suburb') }}

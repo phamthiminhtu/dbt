@@ -6,5 +6,5 @@
   unique_key="lga_code"
 ) }}
 
-SELECT * FROM {{ source('airbnb_raw', 'nsw_lga_code') }}
+SELECT * FROM {{ ref('raw_lga') }}
 {% endsnapshot %}
