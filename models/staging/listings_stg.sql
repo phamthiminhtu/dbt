@@ -1,7 +1,7 @@
 
 WITH
 	listings_source AS
-		(SELECT * FROM {{ ref('raw_fact_listings') }})
+		(SELECT * FROM {{ source('airbnb_raw', 'listings') }})
 
 	SELECT
 		scraped_date,

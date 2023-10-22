@@ -6,5 +6,5 @@
   unique_key="suburb_name"
 ) }}
 
-SELECT * FROM {{ ref('raw_suburb') }}
+SELECT * FROM {{ source('airbnb_raw', 'nsw_lga_suburb') }}
 {% endsnapshot %}

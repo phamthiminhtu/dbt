@@ -11,7 +11,7 @@ WITH
     (SELECT
       *,
       ROW_NUMBER() OVER(PARTITION BY listing_id ORDER BY scraped_date DESC) AS _row_number
-    FROM {{ ref('raw_property') }}
+    FROM {{ source('airbnb_raw', 'listings') }}
     )
 
   SELECT
