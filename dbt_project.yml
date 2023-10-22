@@ -33,8 +33,6 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   bde:
     +materialized: view
-    raw:
-      +materialized: ephemeral
     staging:
       +schema: staging
       +materialized: view
