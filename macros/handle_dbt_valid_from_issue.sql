@@ -1,7 +1,7 @@
 {#-
-  This macro is used to handle cases when the snapshot tables are created 
+  This macro handles cases when the snapshot tables are created 
   after the data was generated.
-  Modularize the logic into a macro to reduce duplicate code.
+  Modularize the logic into a macro to reduce duplicated code.
 -#}
 
 {% macro handle_dbt_valid_from(source, unique_key, columns_to_select) -%}
