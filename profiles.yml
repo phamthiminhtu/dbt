@@ -1,0 +1,12 @@
+bde:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      threads: 4
+      host: XXXXXXXXXXXXX
+      port: 5432
+      user: postgres
+      password: XXXXXXXXX
+      dbname: postgres
+      schema: airbnb_raw
