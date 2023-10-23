@@ -11,7 +11,7 @@
 
 	A few ways to define run_date variable:
 		1. Define the run_date (and interval) in dbt_profiles.yml (default)
-		2. Overrided run_date (and interval) in dbt_profiles.yml by passing vars using
+		2. Override run_date (and interval) in dbt_profiles.yml by passing vars using
 			cli. e.g: `dbt run --vars '{"run_date": "2023-10-01"}'`
 		3. Run with run_date=today by deleting the run_date in dbt_profiles.yml.
 -#}
