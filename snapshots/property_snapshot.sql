@@ -22,5 +22,5 @@ WITH
     accommodates,
     scraped_date::TIMESTAMP AS updated_at
   FROM source
-  WHERE _row_number = 1
+  WHERE _row_number = 1 -- get the most recent info of a listing_id in case of duplication
 {% endsnapshot %}
