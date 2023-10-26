@@ -3,7 +3,6 @@
 {{ 
   handle_dbt_valid_from(
     source=ref('host_snapshot'),
-    unique_key='host_id',
     columns_to_select=[
         'host_id',
         'host_name',

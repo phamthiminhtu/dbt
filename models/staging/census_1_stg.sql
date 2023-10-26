@@ -3,7 +3,6 @@
 {{
   handle_dbt_valid_from(
     source=ref('census_1_snapshot'),
-    unique_key='lga_code_2016',
     columns_to_select=[
       "REPLACE(lga_code_2016, 'LGA', '') AS lga_code",
       'age_0_4_yr_p',

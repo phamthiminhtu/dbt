@@ -1,4 +1,5 @@
 {% snapshot property_snapshot %}
+{%- set run_date = var('run_date', modules.datetime.datetime.today().strftime("%Y-%m-%d")) -%}
 
 {{ config(
   strategy="timestamp",
@@ -12,6 +13,8 @@ WITH
       *,
       ROW_NUMBER() OVER(PARTITION BY listing_id ORDER BY scraped_date DESC) AS _row_number
     FROM {{ source('airbnb_raw', 'listings') }}
+    -- only run 1 date of data to backfill data in the past
+    WHERE scraped_date = '{{ run_date }}'::DATE
     )
 
   SELECT
@@ -22,5 +25,7 @@ WITH
     accommodates,
     scraped_date::TIMESTAMP AS updated_at
   FROM source
-  WHERE _row_number = 1 -- get the most recent info of a listing_id in case of duplication
+  -- get the one unique record in case the unique key has different values within 1 scraped_date
+  -- e.g.: 1 listing_id attached with 2 listing_neighbourhoods
+  WHERE _row_number = 1
 {% endsnapshot %}
